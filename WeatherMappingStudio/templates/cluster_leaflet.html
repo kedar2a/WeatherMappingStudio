@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Weather Map India</title>
+
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.css" />
+	<script src="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.js"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="http://cdn.leafletjs.com/leaflet-0.4.4/leaflet-src.js"></script>
+	<!--[if lte IE 8]><link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.ie.css" /><![endif]-->
+	<script type="text/css" src= "/static/css/screen.css" ></script>
+	<script type="text/css" src= "/static/css/MarkerCluster.css" ></script>
+	<script type="text/css" src= "/static/css/MarkerCluster.Default.css" ></script>
+	
+	<script type="text/javascript" src= "/static/js/leaflet.markercluster-src.js"></script> 
+	<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+	
+	
+</head>
+<body > 
+
+
+		<div id="ClusterMapDiv" style="position:fixed; z-index:10;  top:48px; height:90%; width:100%;margin-left:0px;" >
+	</div>				
+
+	
+	<script type="text/javascript">
+		//alert("before temp");
+		
+		var cmAttr = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
+		
+			cmUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/{styleId}/256/{z}/{x}/{y}.png';
+
+		// creating tile layer 	
+			
+	    	var normalview = L.tileLayer(cmUrl, {styleId: 997, attribution: cmAttr}),
+	    	
+			nightview = L.tileLayer(cmUrl, {styleId: 999, attribution: cmAttr});
+		
+		// creating Layergroup for adding multiple Layer
+		
+		var Temp = new L.LayerGroup();
+		
+		var Hum =  new L.LayerGroup();
+		
+		var Windvel =  new L.LayerGroup();
+		
+		var Search = new L.MarkerClusterGroup();
+		
+		//var Temp = new L.MarkerClusterGroup();
+		var address="";
+		
+		var latitude="";
+		
+		var longitude="";
+		
+		var timestamp="";
+		
+		var len="";
+		
+		var value="";
+		
+		//default temperature marker plotting on page load using ajax function 
+		
+		$.ajax({
+			
+			
+					url: '/visualizing/showcluster/json/',
+					
+					data:{rbtvalue:"Temperature",time_stamp:""},
+					
+					success: function(data)
+					{
+						tempData=JSON.parse(data);
+						
+						len=tempData["values"].length;
+						
+						var timestamp  = tempData["time_stamp"];
+												
+						for(var i=0;i<len ; i++)
+						{
+							title = tempData.values[i]['address'];
+							
+							latitude = tempData.values[i]['latitude'];
+							
+							longitude = tempData.values[i]['longitude'];
+							
+							value = tempData.values[i]['value'];
+							
+							var marker = new L.Marker(new L.LatLng(latitude,longitude),{ title: title });
+							
+							marker.bindPopup("Location : "+title + "<br> Temperature : " + value +" &deg; Celcius");
+							//marker.bindPopup(title);
+							Temp.addLayer(marker);
+							
+							
+						}
+				}
+			});  // ajax function closed
+			
+		
+		// creating baseLayer for adding radio button control
+					 	
+		var baseLayers = {
+		
+				"Temperature":Temp,
+				
+				"Humidity":Hum,
+				
+				"Wind Velocity":Windvel
+			
+			
+			
+						};
+
+		//creating Overaly fro adding checkBox control
+		
+		var overlays = {
+				"Night View":nightview
+			    
+						};
+	
+		// creating map Object 
+	
+		var map = L.map('ClusterMapDiv', {
+		
+			center: [19.04233, 72.92795],
+			
+			zoom: 5,
+			
+			layers: [normalview,Temp]
+			
+										});
+		
+			
+			// finally  add all control in Map
+				
+			L.control.layers(baseLayers,overlays).addTo(map);
+		
+			
+			// plotting marker after clicking radio button
+						
+						$("label").change(function () 
+						{
+							
+							
+							
+								var rbtstr = ($(this).text()).trim();
+								
+								// ajax function for retriving data as per control click
+								
+									$.ajax({
+			
+										url: '/visualizing/showcluster/json/',
+										
+										data:{rbtvalue:rbtstr,time_stamp:""},
+										
+										success: function(data)
+										{
+
+											tempData=JSON.parse(data);
+											
+											len=tempData["values"].length;
+											
+											var timestamp  = tempData["time_stamp"];
+												
+											for(var i=0;i<len ; i++)
+											{
+												title = tempData.values[i]['address'];
+												
+												latitude = tempData.values[i]['latitude'];
+												
+												longitude = tempData.values[i]['longitude'];
+												
+												value = tempData.values[i]['value'];
+																																			
+												
+												if(rbtstr == "Temperature")
+												{	
+													var marker = new L.Marker(new L.LatLng(latitude,longitude),{ title: title });
+													
+													//marker.bindPopup(title);													
+													marker.bindPopup("Location : "+title + "<br>" + rbtstr + " : " + value + "&deg; 														Celcius");
+												// add and remove marker from layer
+													Temp.addLayer(marker);
+													
+													Hum.removeLayer(marker);
+													
+													Windvel.removeLayer(marker);
+												}
+												
+												if(rbtstr == "Humidity")
+												{
+													
+													var marker = new L.Marker(new L.LatLng(latitude,longitude),{ title: title });
+													
+													//marker.bindPopup(title);	
+													marker.bindPopup("Location : "+title + "<br>" + rbtstr + " : " + value + " 														%");									
+												// add and remove marker from layer
+													Hum.addLayer(marker);
+													
+													Temp.removeLayer(marker); 
+													
+													Windvel.removeLayer(marker);
+												}
+												
+												if(rbtstr == "Wind Velocity")
+												{
+													var marker = new L.Marker(new L.LatLng(latitude,longitude),{ title: title });
+													
+													//marker.bindPopup(title);	
+													marker.bindPopup("Location : "+title + "<br>" + rbtstr + " : " + value + " m/s");
+												// add and remove marker from layer
+													
+													Windvel.addLayer(marker);
+													
+													Hum.removeLayer(marker);
+													
+													Temp.removeLayer(marker);
+												}	
+											
+							
+											}	//for loop							
+								
+							
+										} // success method
+										
+									}); //ajax function
+								
+							 
+										
+						}); // label click function
+				
+			
+	
+				
+	</script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+	<!--<!DOCTYPE html>-->
+<html>
+	<head>
+		<title>Weather Map India</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		
+		<title>Leaflet Heatmap demo</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		
+		<!-- script for Jquery -->
+		<script src="http://code.jquery.com/jquery-1.8.0.min.js"></script>
+		
+		<!-- script for Leaflet -->
+		<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.4/leaflet.css" />
+		<script src="http://cdn.leafletjs.com/leaflet-0.4.4/leaflet-src.js"></script>
+		<script src="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.js"></script>
+		
+		<!-- script for Heatmap -->
+		<script type="text/javascript" src="/static/js/heatmap.js"></script>
+		<script type="text/javascript" src="/static/js/heatmap-leaflet.js"></script>
+		<!--<script type="text/javascript" src="/static/js/testData.js"></script> -->
+		
+		<!--[if lte IE 8]>
+		    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.4/leaflet.ie.css" />
+		<![endif]-->
+		
+		<style type="text/css" media="screen">
+			body{
+				margin: 0;
+				padding: 0;
+			}
+
+			#map {
+				width: 100%;
+				height: 100%;
+			}
+		</style>
+		
+		<!-- Main script -->
+		
+		<script type="text/javascript" charset="utf-8">
+		
+							var baseLayer = L.tileLayer(
+											'http://{s}.tile.cloudmade.com/ad132e106cd246ec961bbdfbe0228fe8/997/256/{z}/{x}/{y}.png',{
+											attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> 												contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, 												Imagery © <a href="http://cloudmade.com">CloudMade</a>',
+											maxZoom: 18
+											}
+							);
+				
+							/*var testData={
+    										max: 46,
+    										data: [{lat: 33.5363, lon:-117.044, value: 10},{lat: 35.5608, lon:-117.24, value: 10},{lat: 											38, lon:-97, value: 10},{lat: 40.9358, lon:-77.1621, value: 15}]};/*{lat: 38, lon:-97, value: 2},{lat: 54, lon:-2, value: 1},{lat: 51.5167, lon:-0.7, value: 2},{lat: 51.5167, lon:-0.7, value: 6},{lat: 60.3911, lon:5.3247, value: 1},{lat: 50.8333, lon:12.9167, value: 9},{lat: 50.8333, lon:12.9167, value: 1},{lat: 52.0833, lon:4.3, value: 3},{lat: 52.0833, lon:4.3, value: 1},{lat: 51.8, lon:4.4667, value: 16},{lat: 51.8, lon:4.4667, value: 9},{lat: 51.8, lon:4.4667, value: 2},{lat: 51.1, lon:6.95, value: 1},{lat: 13.75, lon:100.517, value: 1},{lat: 18.975, lon:72.8258, value: 1},{lat: 2.5, lon:112.5, value: 2},{lat: 25.0389, lon:102.718, value: 1},{lat: -27.6167, lon:152.733, value: 1},{lat: -33.7667, lon:150.833, value: 1},{lat: -33.8833, lon:151.217, value: 2},{lat: 9.4333, lon:99.9667, value: 1},{lat: 33.7, lon:73.1667, value: 1},{lat: 33.7, lon:73.1667, value: 2},{lat: 22.3333, lon:114.2, value: 1},{lat: 37.4382, lon:-84.051, value: 1},{lat: 34.6667, lon:135.5, value: 1},{lat: 37.9167, lon:139.05, value: 1},{lat: 36.3214, lon:127.42, value: 1}]};*/
+    				
+							var heatmapLayerTemp = L.TileLayer.heatMap({
+								radius: 20,
+								opacity: 0.8,
+								gradient: {
+									0.45: "rgb(0,0,255)",
+									0.55: "rgb(0,255,255)",
+									0.65: "rgb(0,255,0)",
+									0.95: "red",
+									1.0: "rgb(255,0,0)"
+								}
+							});
+				
+							var heatmapLayerHum = L.TileLayer.heatMap({
+								radius: 20,
+								opacity: 0.8,
+								gradient: {
+									0.45: "rgb(0,0,255)",
+									0.55: "rgb(0,255,255)",
+									0.65: "rgb(0,255,0)",
+									0.95: "yellow",
+									1.0: "rgb(0,255,0)"
+								}
+							});
+			
+						//	heatmapLayerTemp.addData(testData.data);
+							//heatmapLayerHum.addData(testData.data);
+							
+						$.ajax({
+			
+			
+								url: '/visualizing/showheatmap/json/',
+					
+								data:{rbtvalue:"Temperature",time_stamp:""},
+					
+								success: function(data)
+								{
+										var tempData=JSON.parse(data);
+						
+									
+										
+									heatmapLayerTemp.addData(tempData.data);
+										
+								}
+							});  // ajax function closed
+			
+		
+				
+
+							var overlayMaps= {
+								'Temperature': heatmapLayerTemp,'Humidity': heatmapLayerHum
+							};
+				
+							var controls = L.control.layers(overlayMaps);
+				
+							 
+							var map = new L.Map('HeatMapDiv', {
+								center: new L.LatLng(19.04233, 72.92795),
+								zoom: 5,
+								layers: [baseLayer,heatmapLayerTemp]
+							});
+							controls.addTo(map);
+
+			// for radio button click
+			
+			$("label").change(function () 
+						{
+								var rbtstr = ($(this).text()).trim();
+								
+								// ajax function for retriving data as per control click
+								
+									$.ajax({
+			
+										url: '/visualizing/showheatmap/json/',
+										
+										data:{rbtvalue:rbtstr,time_stamp:""},
+										
+										success: function(data)
+										{
+										var tempData=JSON.parse(data);
+											
+												if(rbtstr == "Temperature")
+												{	
+													heatmapLayerTemp.addData(tempData.data);
+												}
+												
+												if(rbtstr == "Humidity")
+												{
+													heatmapLayerHum.addData(tempData.data);
+												}
+										} // success method
+									}); //ajax function
+						}); // label click function 
+		</script>
+	</head>
+	<body>
+		<!-- Map Div -->
+		<div id="HeatMapDiv" style="position:fixed; z-index:10;  top:48px; height:90%; width:100%;" >
+		</div>				
+
+	</body>
+
+		
+</html>

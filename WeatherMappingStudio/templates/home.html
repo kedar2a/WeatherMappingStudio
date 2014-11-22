@@ -1,0 +1,258 @@
+<!--<!DOCTYPE html>-->
+<html>
+	<head>
+	<meta charset="utf-8">
+
+	<link href='http://fonts.googleapis.com/css?family=Merriweather+Sans:400,300' rel='stylesheet' type='text/css' />
+	<link rel='shortcut icon' type='image/x-icon' href='/static/img/favicon.ico' />
+
+	<!-- Jquery script -->
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
+
+	<!-- LiveMap script -->
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.4/leaflet.css" />
+	<script src="http://cdn.leafletjs.com/leaflet-0.4.4/leaflet-src.js"></script>
+	<script src="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.js"></script>
+	
+	<!-- ClusterMap script -->
+	<script type="text/css" src= "/static/css/screen.css" ></script>
+	<script type="text/css" src= "/static/css/MarkerCluster.css" ></script>
+	<script type="text/css" src= "/static/css/MarkerCluster.Default.css" ></script>
+	
+	<script type="text/javascript" src= "/static/js/leaflet.markercluster-src.js"></script>
+	
+
+	<!--[if lte IE 8]><link rel="stylesheet" href="../dist/MarkerCluster.Default.ie.css" /><![endif]-->
+	
+	<!-- HeatMap script -->
+	<script type="text/javascript" src="/static/js/heatmap.js"></script>
+	<script type="text/javascript" src="/static/js/heatmap-leaflet.js"></script>
+	
+	
+	<style type="text/css">
+
+	.firstDiv 
+	{
+		position:fixed; top:0%; height:50px; width:100%; margin-left:-8px; margine-right:-20; right:0;
+		
+		-webkit-box-shadow: 0px 2px 20px rgba(50, 50, 50, 0.69);
+		-moz-box-shadow: 0px 2px 20px rgba(50, 50, 50, 0.69);
+		box-shadow: 0px 2px 20px rgba(50, 50, 50, 0.69);
+		
+		overflow:auto; z-index:100;
+		
+		background-image: linear-gradient(#f3f3f3, #cfcfcf); background-repeat: repeat-x;
+		
+		border-bottom: 1px solid #e5e5e5; border-bottom-width: 0.5px; border-bottom-style: solid; 
+		border-bottom-color: rgb(229, 229, 229);       
+	}
+
+	.firstChildDiv
+	{
+		position:relative; height:50px; float:right; padding-right:30px; padding-left:30px; width:15%; text-align:center;
+	}
+	
+	.commonText
+	{
+		line-height:3;
+		font-family: 'Merriweather Sans', sans-serif; font-weight: 300; 
+	}
+
+	.firstChildDiv:hover
+	{
+		/*background-color:#f3f3f3;  */
+		text-shadow: 0px 0px 5px #edf7ff; color:#669bcf ;
+		cursor:pointer;
+	}
+	
+	.footerCSS
+	{
+		background-color:pink; 
+		
+		width:100%; top:93.5%; height:300px; right:0; margin-left:-8px;
+		
+		overflow:auto; z-index:100; position:absolute; 
+
+		box-shadow: 0px -2px 20px rgba(50, 50, 50, 0.69);	
+			
+		background-image: linear-gradient( #cfcfcf,#f3f3f3); background-repeat: repeat-x;		
+		border-top: 1px solid #e5e5e5; border-top-width: 0.5px; border-top-style: solid; 
+		border-top-color: rgb(229, 229, 229);  
+	}
+
+	.verticalLine
+	{
+		height:50px; width:1px; float:right; background-color:#cfcfcf; border-right: 1px solid #fff;
+	}
+	
+	.wmiLogo
+	{
+		padding-left:10px; padding-right:10px; 3px;margin-top: 0.5px;
+	}
+	
+	.wmiLogo:hover
+	{
+		/*-webkit-filter: hue-rotate(-70deg) saturate(1.5);		*/		
+	}
+	
+	.wmiTitle
+	{
+		float:left; line-height:3;
+		text-shadow: 2px 2px 10px #c3c0c0;		
+		font-family: 'Merriweather Sans', sans-serif; font-weight: 400; 
+		cursor:pointer;		
+	}
+
+	
+	</style>
+	
+	<script type="text/javascript">
+
+		function DivColor(dn)
+		{
+			var n = $(dn).attr("id");
+		
+			$(dn).fadeOut(100, function() {
+				$(dn).css("background-image", "linear-gradient(#f3f3f3, #f3f3f3)").fadeIn(100);
+			});  
+		
+			if(n != "HMV")
+			{
+				$("#HMV").fadeOut(1000, function() {
+				$(this).css("background-image", "linear-gradient(#f3f3f3, #cfcfcf)").fadeIn(1000);
+				});
+			}
+		
+			if(n != "LiveView")
+			{
+				$("#LiveView").fadeOut(1000, function() {
+				$(this).css("background-image", "linear-gradient(#f3f3f3, #cfcfcf)").fadeIn(1000);
+				});
+			}    
+		
+			if(n != "ClusterView")
+			{
+				$("#ClusterView").fadeOut(1000, function() {
+				$(this).css("background-image", "linear-gradient(#f3f3f3, #cfcfcf)").fadeIn(1000);
+				});
+			}
+			   
+		}
+		
+		$( document ).ready(function() 
+		{        
+			LiveView();
+			
+			$("#home").click(function(){ LiveView(); DivColor(); });
+
+			$("#HMV").click(function() { HeatMapView(); DivColor(this);  });
+
+			$("#ClusterView").click(function() { ClusterView(); DivColor(this);  });
+
+			$("#LiveView").click(function() { LiveView(); DivColor(this);  });
+			
+			//var div = document.getElementById("footer");
+			//div.onmouseover = function() { $("#footer").animate({"top": "+66%"}, "slow");  }
+			//div.onmouseout = function() { $("#footer").animate({"top": "+93.5%"}, "slow"); }
+		
+		});		
+		
+		
+		function LiveView()
+		{
+			$.ajax({
+						url: '/show/leaflet/live/',
+						success: function(data){
+						$('#HomeMapDiv').html(data);
+						}
+				  });  
+		}
+
+		function ClusterView() 
+		{ 
+			$.ajax({
+						url: '/show/leaflet/cluster/',
+						success: function(data){
+						$('#HomeMapDiv').html(data);
+						}
+			      });  
+		}
+
+		function HeatMapView() 
+		{ 
+			$.ajax({
+						url: '/show/leaflet/heatmap/',
+						success: function(data){
+						$('#HomeMapDiv').html(data);
+						}
+				   });  
+		}
+		
+		function insertData() 
+		{ 
+			$.ajax({
+						url: '/show/page/inputpage/',
+						success: function(data){
+						$('#content').html(data);
+						}
+				   });  
+		}
+		
+	</script>
+	
+</head>
+
+<body style='overflow:hidden;'>
+
+	<!-- Header Div -->		
+	<div id="WMI" class="firstDiv">
+		    
+		    <span title="Home" id="home" style="float:left; cursor:pointer;">
+		    	<img class="wmiLogo" src="/static/img/WMILogo.png" height="45" width="50" alt=""/>
+			</span>
+			
+			<span title="Home" class="wmiTitle" >
+				Weather Mapping Studio
+			</span>		    
+		    
+		    <div style="position:relative; height:50px; float:right; padding-right:5px; padding-left:5px; width:5%; text-align:center;">
+		        <b class="commonText">LOG IN</b>
+		    </div>
+		    
+		    <div class="verticalLine" ></div>
+		    
+		    
+		    <!-- Heat Map View Div -->		
+		    <div id="HMV" class="firstChildDiv" title="Info about Heat Map">
+		        <b class="commonText">HeatMap View</b>
+		    </div>
+		    
+		    <div class="verticalLine" ></div>
+		    
+		    <!-- Cluster View Div -->
+		    <div id="ClusterView" class="firstChildDiv" title="Info about Cluster Map View">
+		        <b class="commonText">Marker View</b>
+		    </div>
+		    
+		    <!-- Live View Div -->
+		    <div class="verticalLine"></div>
+		    
+		    <div id="LiveView" class="firstChildDiv" title="Info about Live Map View" >
+		        <b class="commonText">Live View</b>
+		    </div>
+		
+		    <div class="verticalLine"></div>		    
+		    		    
+	</div>	
+
+	<!-- Map Div -->
+	<div id="HomeMapDiv" style="position:fixed; z-index:10;  top:48px; height:90%; width:100%; margin-left:-8px; right:0;" >
+	</div>				
+
+	<!-- Footer Div -->				
+	<div class="footerCSS" id="footer">
+		<b class="CommonText" style="padding-left:20px">About us...</b>
+	</div>
+	
+</body>
+</html> 

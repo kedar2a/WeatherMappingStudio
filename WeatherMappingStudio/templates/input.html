@@ -1,0 +1,130 @@
+<html>
+
+	<head>
+	<title> Input Data From </title>
+	<style>
+	
+		.formDivOverlay 
+		{
+			position:fixed; top:30%; left:50%; height:70%; width:30%;
+			
+			margin-top: -10em; margin-left: -13em; 
+
+  			border-color:#cfcfcf; border-style:solid; border-width:8px; border-radius:5px; background-clip: padding-box;  			
+  			  			
+  			-webkit-box-shadow: 2px 2px 20px rgba(50, 50, 50, 0.69);
+			-moz-box-shadow: 2px 2px 20px rgba(50, 50, 50, 0.69);
+			box-shadow: 2px 2px 20px rgba(50, 50, 50, 0.69);
+		
+  			align:center;
+		    overflow:auto;
+		    
+			position:absolute;  z-index:100;			
+
+			background:#ffffff; opacity:0.95; 		
+			
+			
+		}		
+		
+		.registerDiv 
+		{
+			position:relative; top:1%; height:50px; width:100%; ;
+		
+			-webkit-box-shadow: 0px 2px 20px rgba(50, 50, 50, 0.69);
+			-moz-box-shadow: 0px 2px 20px rgba(50, 50, 50, 0.69);
+			box-shadow: 0px 2px 20px rgba(50, 50, 50, 0.69);
+			line-height:50px;
+			overflow:auto; z-index:100;
+		
+			background-image: linear-gradient(#f3f3f3, #cfcfcf); background-repeat: repeat-x;
+		
+			border-bottom: 1px solid #e5e5e5; border-bottom-width: 0.5px; border-bottom-style: solid; 
+			border-bottom-color: rgb(229, 229, 229);       
+			
+			border-top: 1px solid #e5e5e5; border-top-width: 0.5px; border-top-style: solid; 
+			border-top-color: rgb(250, 250, 250);       
+		}
+		
+		td{text-align:left;padding:5px;}
+	
+	</style>
+	</head>
+	<script>
+		function saveFile() 
+		{
+			var filename = document.getElementById("f1");
+			var name=filename.value;
+			var fname="";
+			
+			alert("file sent..!");	
+			$.ajax({
+					url: '/inserting/data/csv/',
+					type: 'POST',
+					data:{fname:name,csrfmiddlewaretoken:'{{csrf_token}}'},
+					/*success: function(data){
+						$('#content').html(data);
+					}*/
+			});
+		}
+	</script>
+	
+	<body>
+		<div id="RegForm" class="formDivOverlay" align="center">
+		
+			<br/>
+			<br/>
+			<div class="registerDiv ">
+				Register
+			</div>
+			<br/>
+			<br/>
+
+			<table>
+				<tr>
+					<td>FirstName</td>
+					<td><input type ="text" name ="fname"></td>
+				</tr>
+				<tr>
+					<td>LastName</td>
+					<td><input type ="text" name ="lname"></td>
+				</tr>
+				<tr>
+					<td>Email</td>
+					<td><input type ="text" name ="email">
+				</tr>
+				<tr>
+					<td>Mobile</td>
+					<td><input type ="text" name ="mobile"></td>
+				</tr>
+				<tr>
+					<td>Area</td>
+					<td><input type ="text" name ="area"></td>
+				</tr>
+				
+				<tr>
+					<td><br/>Temperature</td>
+					<td><br/><input type ="text" name ="Temp"></td>
+				</tr>
+				<tr>
+					<td>Wind Velocity</td>
+					<td><input type ="text" name ="windvel"></td>
+				</tr>
+				<tr>
+					<td>Humidity</td>
+					<td><input type ="text" name ="humidity" ></td>
+				</tr>
+				<tr>
+					<td><br/>Please select file</td>
+					<td><br/><input id = "f1" type="file" name="datafile" size="10"></td>
+				</tr>
+			</table>
+				
+			<br/>
+			
+			<input type="submit" value="Send" onclick="saveFile()">
+			
+		</div>
+		
+	</body>
+</html>
+
